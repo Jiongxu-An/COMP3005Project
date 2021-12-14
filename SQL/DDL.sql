@@ -21,7 +21,7 @@ create table customer
 create table book
      (isbn               numeric(13,0),
       publisher_id       varchar(5),
-      title              varchar(30),
+      title              varchar(20),
       author             varchar(20),
       genre              varchar(10),
       pages              int,
@@ -35,7 +35,7 @@ create table sale
      (sale_number		varchar(5),
       publisher_id       varchar(5),
       isbn               numeric(13,0),
- 	sale_percentage	numeric(2,0),
+ 	sale_percentage	numeric(1,2),
   	primary key (sale_number),
       foreign key (publisher_id) references publisher,
       foreign key (isbn) references book
