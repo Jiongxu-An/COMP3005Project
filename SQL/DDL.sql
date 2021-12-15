@@ -12,7 +12,6 @@ create table customer
 	(customer_id		varchar(5),
       email              varchar(30),
 	name		     varchar(30),
-      password           varchar(20),
 	shipping    		varchar(30),
       billing            varchar(30),
 	primary key (customer_id)
@@ -23,7 +22,7 @@ create table book
       publisher_id       varchar(5),
       title              varchar(100),
       author             varchar(20),
-      genre              varchar(10),
+      genre              varchar(30),
       pages              int,
       price              numeric(5,2),
       primary key (isbn),
