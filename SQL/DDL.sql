@@ -18,7 +18,7 @@ create table customer
 	);
 
 create table book
-     (isbn               numeric(13,0),
+     (isbn               varchar(13),
       publisher_id       varchar(5),
       title              varchar(100),
       author             varchar(20),
@@ -27,13 +27,13 @@ create table book
       price              numeric(5,2),
       primary key (isbn),
       foreign key (publisher_id) references publisher,
-      check (pages > 0 and isbn > 0)
+      check (pages > 0)
      );
 
 create table sale
      (sale_number		varchar(5),
       publisher_id       varchar(5),
-      isbn               numeric(13,0),
+      isbn               varchar(13),
  	sale_percentage	numeric(2,2),
   	primary key (sale_number),
       foreign key (publisher_id) references publisher,
@@ -42,7 +42,7 @@ create table sale
 
 create table basket
 	(basket_id		varchar(5),
-      isbn               numeric(13,0),
+      isbn               varchar(13),
 	customer_id		varchar(10),
 	primary key (basket_id),
       foreign key (isbn) references book,
