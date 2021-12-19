@@ -3,10 +3,10 @@ import java.util.*;
 import java.io.*;
 
 public class JDBC {
-    static final int port = 5432;
-    static final String db = "bookstoreDB";
+    static final int port = 8080;
+    static final String db = "postgres";
     static final String user = "postgres";
-    static final String password = "DUHESE7B_pg";
+    static final String password = "password";
     static final String url = "jdbc:postgresql://localhost:" + port + "/" + db;
 
     public static void main(String[] args) {
@@ -194,22 +194,86 @@ public class JDBC {
                                 System.out.println("1. Add a Book to Basket");
                                 System.out.println("2. Remove a Book from Basket");
                                 System.out.println("0. Return to Previous Menu\n");
+                                System.out.print("Enter your choice: ");
 
                                 basketChoice = scanner.nextInt();
 
                                 switch (basketChoice){
                                     case 1:
+                                        scanner.nextLine();
                                         System.out.print("Enter ISBN to Add Book: ");
                                         String isbn = scanner.nextLine();
                                         try (Connection conn = DriverManager.getConnection(url, user, password);
                                              Statement stmt = conn.createStatement();
                                         ){
-                                            String query = "insert into basket values ()";
+                                            int basket_id = 1000;
+                                            try{
+                                                String maxID = "select basket_id from basket where basket_id = (select max(basket_id) from basket)";
+
+                                                ResultSet rs_id = stmt.executeQuery(maxID);
+                                                while (rs_id.next()) {
+                                                    basket_id = rs_id.getInt("basket_id") + 1;
+                                                }
+                                            } catch (SQLException e){
+                                                System.out.println(e);
+                                            }
+                                            String query = "insert into basket values (?, ?)";
+                                            PreparedStatement pstmt = conn.prepareStatement(query);
+                                            pstmt.setInt(1, basket_id);
+                                            pstmt.setString(2, isbn);
+                                            try{
+                                                pstmt.executeUpdate();
+                                                System.out.println("Successfully added into basket");
+                                            } catch (SQLException e){
+                                                System.out.println(e);
+                                            }
                                         } catch (Exception e){
                                             System.out.println(e);
                                         }
                                         break;
                                     case 2:
+
+                                        try (Connection conn = DriverManager.getConnection(url, user, password);
+                                             Statement stmt = conn.createStatement();
+                                        ){
+                                            // list all books in the basket
+                                            boolean found = false;
+                                            try {
+                                                String basket = "select isbn from basket";
+                                                ResultSet rs = stmt.executeQuery(basket);
+                                                while (rs.next()) {
+                                                    System.out.println(rs.getString("isbn"));
+                                                    found = true;
+                                                }
+                                            } catch (SQLException e){
+                                                System.out.println(e);
+                                            }
+                                            // Remove implementation
+                                            if (found){
+                                                scanner.nextLine();
+                                                System.out.print("Enter the ISBN to remove a book from basket: ");
+
+                                                String input = scanner.nextLine(); // user input ISBN
+                                                try{
+                                                    String query = "delete from basket where basket_id = (select basket_id from basket where isbn = ? limit 1);";
+                                                    PreparedStatement pstmt = conn.prepareStatement(query);
+                                                    pstmt.setString(1, input);
+                                                    int deleted = pstmt.executeUpdate();
+                                                    if (deleted == 0){
+                                                        System.out.println("ISBN does not match with the books in the basket");
+                                                    } else {
+                                                        System.out.println("Successfully Removed");
+                                                    }
+                                                }catch (SQLException e){
+                                                    System.out.println(e);
+                                                }
+                                            } else {
+                                                System.out.println("The basket is empty");
+                                            }
+
+                                        } catch (Exception e){
+                                            System.out.println(e);
+                                        }
                                         break;
                                 }
                                 break;
