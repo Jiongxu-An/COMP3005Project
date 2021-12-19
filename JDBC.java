@@ -346,6 +346,10 @@ public class JDBC {
                                     String genre = scanner.nextLine();
                                     System.out.print("Enter Number of Page: ");
                                     int page = scanner.nextInt();
+                                    System.out.print("Enter the number of book: ");
+                                    int num_available = scanner.nextInt();
+                                    System.out.print("Enter the sale percentage (Recommend 0.05 ~ 0.20): ");
+                                    float sale_percentage = scanner.nextFloat();
 
                                     // check if inputted publisher exists
                                     String query = "select publisher_id from publisher where name = ?";
@@ -378,7 +382,8 @@ public class JDBC {
                                             publisher_id = Integer.toString(newID);
                                         }
 
-                                        String insertBook = "insert into book values (?, ?, ?, ?, ?, ?, ?)";
+                                        // Insert new book
+                                        String insertBook = "insert into book values (?, ?, ?, ?, ?, ?, ?, ?, 0, ?)";
                                         PreparedStatement pstmtBook = conn.prepareStatement(insertBook);
                                         pstmtBook.setString(1, isbn);
                                         pstmtBook.setString(2, publisher_id);
@@ -387,6 +392,8 @@ public class JDBC {
                                         pstmtBook.setString(5,genre);
                                         pstmtBook.setInt(6, page);
                                         pstmtBook.setFloat(7, price);
+                                        pstmtBook.setInt(8, num_available);
+                                        pstmtBook.setFloat(9, sale_percentage);
                                         try {
                                             pstmtBook.executeUpdate();
                                             System.out.println("New book added");
