@@ -25,20 +25,13 @@ create table book
       genre              varchar(30),
       pages              int,
       price              numeric(5,2),
+      num_available      int,
+      num_sold           int,
+      sale_percentage    numeric(2,2),
       primary key (isbn),
       foreign key (publisher_id) references publisher,
       check (pages > 0)
      );
-
-create table sale
-     (sale_number		varchar(5),
-      publisher_id       varchar(5),
-      isbn               varchar(13),
- 	sale_percentage	numeric(2,2),
-  	primary key (sale_number),
-      foreign key (publisher_id) references publisher,
-      foreign key (isbn) references book
-	);
 
 create table basket
 	(basket_id		varchar(5),
