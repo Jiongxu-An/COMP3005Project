@@ -36,10 +36,8 @@ create table book
 create table basket
 	(basket_id		varchar(5),
       isbn               varchar(13),
-	customer_id		varchar(10),
 	primary key (basket_id),
       foreign key (isbn) references book,
-      foreign key (customer_id) references customer
 	);
 
 create table order_info
