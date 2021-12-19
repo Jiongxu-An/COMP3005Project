@@ -1,18 +1,17 @@
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 import java.io.*;
 
 public class JDBC {
-    static final int port = 8080;
-    static final String db = "postgres";
+    static final int port = 5432;
+    static final String db = "bookstoreDB";
     static final String user = "postgres";
-    static final String password = "password";
+    static final String password = "DUHESE7B_pg";
     static final String url = "jdbc:postgresql://localhost:" + port + "/" + db;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        int choice, subChoice, search, basketChoice;
+        int choice, subChoice, search, basketChoice, reportChoice;
         //String input;
         do {
             System.out.println("\nMain Menu");
@@ -200,33 +199,12 @@ public class JDBC {
 
                                 switch (basketChoice){
                                     case 1:
-                                        scanner.nextLine();
                                         System.out.print("Enter ISBN to Add Book: ");
                                         String isbn = scanner.nextLine();
                                         try (Connection conn = DriverManager.getConnection(url, user, password);
                                              Statement stmt = conn.createStatement();
                                         ){
-                                            int basket_id = 1000;
-                                            try{
-                                                String maxID = "select basket_id from basket where basket_id = (select max(basket_id) from basket)";
-
-                                                ResultSet rs_id = stmt.executeQuery(maxID);
-                                                while (rs_id.next()) {
-                                                    basket_id = rs_id.getInt("basket_id");
-                                                }
-                                            } catch (SQLException e){
-                                                System.out.println(e);
-                                            }
-                                            String query = "insert into basket values (?, ?)";
-                                            PreparedStatement pstmt = conn.prepareStatement(query);
-                                            pstmt.setInt(1, basket_id);
-                                            pstmt.setString(2, isbn);
-                                            try{
-                                                pstmt.executeUpdate();
-                                                System.out.println("Successfully added into basket");
-                                            } catch (SQLException e){
-                                                System.out.println(e);
-                                            }
+                                            String query = "insert into basket values ()";
                                         } catch (Exception e){
                                             System.out.println(e);
                                         }
@@ -254,7 +232,35 @@ public class JDBC {
 
                         switch (subChoice) {
                             case 1:
-                                System.out.println("1");
+                                try (Connection connection = DriverManager.getConnection(url, user, password);
+                                     Statement statement = connection.createStatement();){
+                                    do {
+                                        System.out.println("\n1. Sales vs Expenditures" +
+                                                "\n2. Sales per Genre" +
+                                                "\n3. Sales per Author" +
+                                                "\n0. Return to Previous Menu" +
+                                                "\nEnter Your Choice: ");
+
+                                        reportChoice = scanner.nextInt();
+                                        switch (reportChoice) {
+                                            case 1:
+                                                Reports.SalesExpenditure(statement);
+                                                break;
+
+                                            case 2:
+                                                Reports.SalesPerGenre(statement);
+                                                break;
+
+                                            case 3:
+                                                Reports.SalesPerAuthor(statement);
+                                                break;
+                                        }
+                                    }   while (reportChoice != 0);
+                                    break;
+
+                                } catch(Exception sqle){
+                                    System.out.println(sqle);
+                                }
                                 break;
                             case 2:
                                 try (Connection conn = DriverManager.getConnection(url, user, password);
@@ -335,8 +341,8 @@ public class JDBC {
                                      Statement stmt = conn.createStatement();
                                 ){
                                     // list all books
-                                    System.out.println("ISBN          Title");
                                     ResultSet rs = stmt.executeQuery("select isbn, title from book");
+                                    System.out.println("ISBN          Title");
                                     while (rs.next()){
                                         System.out.println(rs.getString("isbn") + " " + rs.getString("title"));
                                     }
