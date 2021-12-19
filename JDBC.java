@@ -1,3 +1,4 @@
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.*;
 import java.io.*;
@@ -199,12 +200,33 @@ public class JDBC {
 
                                 switch (basketChoice){
                                     case 1:
+                                        scanner.nextLine();
                                         System.out.print("Enter ISBN to Add Book: ");
                                         String isbn = scanner.nextLine();
                                         try (Connection conn = DriverManager.getConnection(url, user, password);
                                              Statement stmt = conn.createStatement();
                                         ){
-                                            String query = "insert into basket values ()";
+                                            int basket_id = 1000;
+                                            try{
+                                                String maxID = "select basket_id from basket where basket_id = (select max(basket_id) from basket)";
+
+                                                ResultSet rs_id = stmt.executeQuery(maxID);
+                                                while (rs_id.next()) {
+                                                    basket_id = rs_id.getInt("basket_id");
+                                                }
+                                            } catch (SQLException e){
+                                                System.out.println(e);
+                                            }
+                                            String query = "insert into basket values (?, ?)";
+                                            PreparedStatement pstmt = conn.prepareStatement(query);
+                                            pstmt.setInt(1, basket_id);
+                                            pstmt.setString(2, isbn);
+                                            try{
+                                                pstmt.executeUpdate();
+                                                System.out.println("Successfully added into basket");
+                                            } catch (SQLException e){
+                                                System.out.println(e);
+                                            }
                                         } catch (Exception e){
                                             System.out.println(e);
                                         }
@@ -313,8 +335,8 @@ public class JDBC {
                                      Statement stmt = conn.createStatement();
                                 ){
                                     // list all books
-                                    ResultSet rs = stmt.executeQuery("select isbn, title from book");
                                     System.out.println("ISBN          Title");
+                                    ResultSet rs = stmt.executeQuery("select isbn, title from book");
                                     while (rs.next()){
                                         System.out.println(rs.getString("isbn") + " " + rs.getString("title"));
                                     }
