@@ -307,17 +307,11 @@ public class JDBC {
                                     int userInput = scanner.nextInt();
                                     System.out.println(userInput);
                                     if(userInput != 1){
-                                        shipping = "";
-                                        billing = "";
-                                        //while(shipping != ""){
-                                            System.out.println("Enter shipping address: ");
+                                        scanner.nextLine();
+                                            System.out.print("Enter shipping address: ");
                                             shipping = scanner.nextLine();
-                                        //}
-                                        //while(billing != ""){
-                                            System.out.println("Enter billing address: ");
+                                            System.out.print("Enter billing address: ");
                                             billing = scanner.nextLine();
-                                        //}
-
                                     }
                                     else{
                                         shipping = resultSet.getString("shipping");
