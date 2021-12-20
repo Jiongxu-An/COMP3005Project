@@ -14,7 +14,7 @@ create table customer
 	name		     varchar(30),
 	shipping    		varchar(30),
       billing            varchar(30),
-	primary key (customer_id),
+	primary key (customer_id)
 	);
 
 create table book
