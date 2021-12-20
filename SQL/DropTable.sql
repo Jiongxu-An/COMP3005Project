@@ -1,4 +1,3 @@
-drop table sale;
 drop table basket;
 drop table book;
 drop table publisher;
