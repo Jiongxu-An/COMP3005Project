@@ -11,11 +11,10 @@ create table publisher
 create table customer
 	(customer_id		varchar(5),
       email              varchar(30),
-	basket_id		     varchar(30),
+	name		     varchar(30),
 	shipping    		varchar(30),
       billing            varchar(30),
 	primary key (customer_id),
-	foreign key (basket_id) references basket
 	);
 
 create table book
@@ -44,7 +43,7 @@ create table basket
 create table order_info
 	(order_number		varchar(5),
       customer_id        varchar(5),
-	name		     varchar(30),
+	basket_id		     varchar(5),
 	shipping    		varchar(30),
       billing            varchar(30),
 	primary key (order_number),
