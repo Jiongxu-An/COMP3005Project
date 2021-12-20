@@ -1,18 +1,23 @@
 import java.sql.*;
 import java.util.*;
 import java.io.*;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static java.lang.String.valueOf;
 
 public class JDBC {
-    static final int port = 8080;
-    static final String db = "postgres";
+    static final int port = 5432;
+    static final String db = "bookstoreDB";
     static final String user = "postgres";
-    static final String password = "password";
+    static final String password = "DUHESE7B_pg";
     static final String url = "jdbc:postgresql://localhost:" + port + "/" + db;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int choice, subChoice, search, basketChoice, reportChoice;
-        //String input;
+        HashSet<Integer> trackingNums = new HashSet<Integer>();
+        HashSet<Integer> orderNums = new HashSet<Integer>();
+        String userEmail, shipping, billing;
         do {
             System.out.println("\nMain Menu");
             System.out.println("1. Create Table (Insert DDL)");
@@ -278,8 +283,95 @@ public class JDBC {
                                 }
                                 break;
                             case 3:
-                                System.out.println("Place Order");
-                                break;
+
+                                try (Connection connection = DriverManager.getConnection(url, user, password);
+                                     Statement statement = connection.createStatement();) {
+                                    ResultSet resultSet = statement.executeQuery("select count(isbn) from basket");
+                                    resultSet.next();
+                                    int numBooks = resultSet.getInt(1);
+                                    if(numBooks < 1) {
+                                        System.out.println("Basket empty, add books before ordering");
+                                        break;
+                                    }
+                                    System.out.print("Please enter account email address: ");
+                                    userEmail = scanner.next();
+                                    resultSet = statement.executeQuery("select * from customer where email = '"+ userEmail + "'");
+                                    if(!resultSet.next()) {
+                                        System.out.println("No account found with email address \""+ userEmail + "\"");
+                                        break;
+                                    }
+                                    System.out.print("Welcome, " + resultSet.getString("name")
+                                            + "\n Would you like to use shipping address \"" + resultSet.getString("shipping")
+                                            + "\"\n and billing address \""+ resultSet.getString("billing")
+                                            + "\"?\n1. Yes\n2. No\n\nEnter Your Choice: ");
+                                    int userInput = scanner.nextInt();
+                                    System.out.println(userInput);
+                                    if(userInput != 1){
+                                        shipping = "";
+                                        billing = "";
+                                        //while(shipping != ""){
+                                            System.out.println("Enter shipping address: ");
+                                            shipping = scanner.nextLine();
+                                        //}
+                                        //while(billing != ""){
+                                            System.out.println("Enter billing address: ");
+                                            billing = scanner.nextLine();
+                                        //}
+
+                                    }
+                                    else{
+                                        shipping = resultSet.getString("shipping");
+                                        billing = resultSet.getString("billing");
+                                    }
+
+                                    int orderNum, trackingNum;
+                                    while(true){
+                                        orderNum = ThreadLocalRandom.current().nextInt(10000, 99999 + 1);
+                                        if(!orderNums.contains(orderNum)) break;
+                                    }
+                                    while(true) {
+                                        trackingNum = ThreadLocalRandom.current().nextInt(10000, 99999 + 1);
+                                        if (!trackingNums.contains(trackingNum)) break;
+                                    }
+
+                                    PreparedStatement ps = connection.prepareStatement("insert into order_info values (?,?,?,?,?)");
+                                    ps.setString(1, Integer.toString(orderNum));
+                                    ps.setString(2, resultSet.getString("customer_id"));
+                                    resultSet = statement.executeQuery("select basket_id from basket");
+                                    resultSet.next();
+                                    ps.setString(3, resultSet.getString("basket_id"));
+                                    ps.setString(4, shipping);
+                                    ps.setString(5, billing);
+
+                                    try {
+                                        ps.executeUpdate();
+                                        System.out.println("Your order has been placed!");
+                                    } catch (SQLException e){
+                                        System.out.println(e);
+                                    }
+
+                                    ps = connection.prepareStatement("insert into tracking values(?,?)");
+                                    ps.setString(1, Integer.toString(trackingNum));
+                                    ps.setString(2, Integer.toString(orderNum));
+
+                                    try{
+                                        ps.executeUpdate();
+                                        System.out.println("Your tracking number for order "+orderNum+" is "+trackingNum);
+                                    } catch(SQLException e){
+                                        System.out.println(e);
+                                    }
+                                    ps = connection.prepareStatement("delete from basket");
+                                    try{
+                                        ps.executeUpdate();
+                                    } catch(SQLException e){
+                                        System.out.println(e);
+                                    }
+                                    break;
+
+                                } catch(Exception sqle){
+                                    System.out.println(sqle);
+                                }
+
                         }
                     } while (subChoice != 0);
                     break;
