@@ -354,12 +354,24 @@ public class JDBC {
                                     } catch(SQLException e){
                                         System.out.println(e);
                                     }
+                                    resultSet = statement.executeQuery("select isbn from basket");
+                                    while(resultSet.next()){
+                                        ps = connection.prepareStatement("update book set num_sold = num_sold+1 where isbn=?");
+                                        ps.setString(1, resultSet.getString("isbn"));
+                                        try{
+                                            ps.executeUpdate();
+                                        } catch(SQLException e){
+                                            System.out.println(e);
+                                        }
+                                    }
+
                                     ps = connection.prepareStatement("delete from basket");
                                     try{
                                         ps.executeUpdate();
                                     } catch(SQLException e){
                                         System.out.println(e);
                                     }
+                                    
                                     break;
 
                                 } catch(Exception sqle){
