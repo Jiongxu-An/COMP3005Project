@@ -6,9 +6,9 @@ The project is to make a bookstore database using implementation of JDBC.
 
 ## Installation
 
-Use the sql shell [pip](https://www.postgresql.org/).
+Use the sql shell [PostgreSQL](https://www.postgresql.org/).
 
-Use the external driver [pip](https://jdbc.postgresql.org/) as JDBC driver.
+Use the external driver [JDBC](https://jdbc.postgresql.org/) as JDBC driver.
 
 
 ## Usage
